@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block page_title %}Gestión de Usuarios{% endblock %}
+{% block page_title_mobile %}🔐 Usuarios{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+      {% for u in rows %}
+      <tr>
+        <td style="color:#94a3b8;font-size:12px">#{{ u.id }}</td>
+        <td style="font-weight:600">{{ u.username }}</td>
+        <td><span class="badge {{ 'b-listoretirar' if u.rol=='administrador' else 'b-ingresado' }}">{{ u.rol }}</span></td>
+        <td><span class="badge" style="{{ 'background:#dcfce7;color:#166534' if u.activo else 'background:#f1f5f9;color:#64748b' }}">{{ 'Activo' if u.activo else 'Inactivo' }}</span></td>
+        <td style="white-space:nowrap">
+          <form method="post" action="{{ url_for('usuario_toggle', uid=u.id) }}" style="display:inline">
+            <button class="btn btn-sm btn-outline" type="submit">{{ '🔴 Desactivar' if u.activo else '🟢 Activar' }}</button>
+          </form>
+          <button class="btn btn-sm btn-outline" onclick="showPass({{ u.id }}, '{{ u.username }}')">🔑 Cambiar pass</button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="position:sticky;top:70px">
+  <div class="card-header"><h3>+ Nuevo Usuario</h3></div>
+  <div class="card-body">
+    <form method="post" action="{{ url_for('usuario_nuevo') }}">
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Usuario *</label>
+        <input type="text" name="username" required>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Contraseña *</label>
+        <input type="password" name="password" required>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Rol *</label>
+        <select name="rol">
+          <option value="usuario">Usuario</option>
+          <option value="administrador">Administrador</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%">✚ Crear Usuario</button>
+    </form>
+  </div>
+</div>
+</div>
+
+<!-- Modal cambiar contraseña -->
+<div class="modal-overlay" id="passModal">
+  <div class="modal">
+    <h3>🔑 Cambiar Contraseña</h3>
+    <p id="passModalUser" style="font-size:13px;color:#64748b;margin-bottom:16px"></p>
+    <form method="post" id="passForm">
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Nueva contraseña *</label>
+        <input type="password" name="password" required minlength="4">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closePass()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function showPass(uid, uname) {
+  document.getElementById('passModalUser').textContent = 'Usuario: ' + uname;
+  document.getElementById('passForm').action = '/usuarios/' + uid + '/pass';
+  document.getElementById('passModal').classList.add('open');
+}
+function closePass() { document.getElementById('passModal').classList.remove('open'); }
+document.getElementById('passModal').addEventListener('click', e => { if (e.target===e.currentTarget) closePass(); });
+</script>
+{% endblock %}

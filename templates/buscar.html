@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Búsqueda{% endblock %}
+{% block page_title %}Búsqueda Global{% endblock %}
+{% block page_title_mobile %}🔍 Buscar{% endblock %}
+{% block content %}
+<form class="filter-bar" method="get" action="{{ url_for('buscar_global') }}" style="margin-bottom:20px">
+  <input type="text" name="q" value="{{ q }}" placeholder="Buscar escrituras, clientes, números…" style="flex:1;min-width:220px;font-size:15px;padding:10px 14px" autofocus>
+  <button class="btn btn-primary" type="submit" style="padding:10px 20px">🔍 Buscar</button>
+  {% if q %}<a href="{{ url_for('buscar_global') }}" class="btn btn-outline">✕ Limpiar</a>{% endif %}
+</form>
+
+{% if q %}
+<div style="font-size:13px;color:var(--muted);margin-bottom:18px">
+  {% if res.total == 0 %}No se encontraron resultados para <strong>"{{ q }}"</strong>
+  {% else %}<strong>{{ res.total }}</strong> resultado{{ 's' if res.total != 1 }} para <strong>"{{ q }}"</strong>{% endif %}
+</div>
+
+{% if res.escrituras %}
+<div class="card" style="margin-bottom:16px">
+  <div class="card-header">
+    <h3>📜 Escrituras ({{ res.escrituras|length }})</h3>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Tipo</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Honorarios</th></tr></thead>
+      <tbody>
+      {% for e in res.escrituras %}
+      <tr>
+        <td><a href="{{ url_for('escritura_editar', eid=e.id) }}" style="color:#1d4ed8;font-weight:700">{{ e.numero }}</a></td>
+        <td style="font-size:12px;color:var(--muted)">{{ e.tipo }}</td>
+        <td style="font-weight:500">{{ e.cliente }}</td>
+        <td style="font-size:12px;color:var(--muted)">{{ e.fecha }}</td>
+        <td>
+          {% set estado = e.estado %}
+          {% if estado=='Ingresado' %}<span class="badge b-ingresado">{{ estado }}</span>
+          {% elif estado=='Redactada' %}<span class="badge b-redactada">{{ estado }}</span>
+          {% elif estado=='Firmada' %}<span class="badge b-firmada">{{ estado }}</span>
+          {% elif estado=='En Proceso' %}<span class="badge b-enproceso">{{ estado }}</span>
+          {% elif estado=='Listo para Retirar' %}<span class="badge b-listoretirar">{{ estado }}</span>
+          {% else %}<span class="badge b-entregado">{{ estado }}</span>{% endif %}
+        </td>
+        <td style="font-weight:600;color:var(--navy)">{{ fmtQ(e.honorarios) }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if res.clientes %}
+<div class="card">
+  <div class="card-header"><h3>👥 Clientes ({{ res.clientes|length }})</h3></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nombre</th><th>Teléfono</th><th>WhatsApp</th><th>DPI</th><th></th></tr></thead>
+      <tbody>
+      {% for c in res.clientes %}
+      <tr>
+        <td style="font-weight:600">{{ c.nombre }}</td>
+        <td style="font-size:12px">{{ c.telefono or '—' }}</td>
+        <td style="font-size:12px">
+          {% if c.whatsapp %}
+          <a href="https://wa.me/502{{ c.whatsapp }}" target="_blank" style="color:#16a34a;font-weight:600">📱 {{ c.whatsapp }}</a>
+          {% else %}—{% endif %}
+        </td>
+        <td style="font-size:12px;color:var(--muted)">{{ c.dpi or '—' }}</td>
+        <td><a href="{{ url_for('cliente_editar', cid=c.id) }}" class="btn btn-sm btn-outline">✏️ Ver</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% elif not q %}
+<div style="text-align:center;padding:60px 20px;color:var(--muted)">
+  <div style="font-size:48px;margin-bottom:16px">🔍</div>
+  <div style="font-size:16px;font-weight:600;margin-bottom:8px">Búsqueda Global</div>
+  <div style="font-size:13px">Busca por número de escritura, nombre de cliente, tipo, DPI, teléfono…</div>
+</div>
+{% endif %}
+{% endblock %}

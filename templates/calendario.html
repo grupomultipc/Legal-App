@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Calendario{% endblock %}
+{% block page_title %}Calendario de Vencimientos{% endblock %}
+{% block page_title_mobile %}📅 Calendario{% endblock %}
+{% block content %}
+
+<!-- Resumen rápido -->
+<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px">
+  <div class="stat-card" style="border-color:#fecaca">
+    <div class="val" style="font-size:26px;color:var(--red)">{{ vencidas|length }}</div>
+    <div class="lbl">⚠️ Vencidas</div>
+  </div>
+  <div class="stat-card" style="border-color:#fef9c3">
+    <div class="val" style="font-size:26px;color:#854d0e">{{ proximas|selectattr('fecha_reg_mercantil','ne','') | list | length }}</div>
+    <div class="lbl">📅 Próximas</div>
+  </div>
+  <div class="stat-card" style="border-color:#bbf7d0">
+    <div class="val" style="font-size:26px;color:var(--green)">{{ hoy }}</div>
+    <div class="lbl">📆 Hoy</div>
+  </div>
+</div>
+
+<!-- Vencidas -->
+{% if vencidas %}
+<div class="card" style="border-color:#fecaca;margin-bottom:20px">
+  <div class="card-header" style="background:#fff5f5">
+    <h3 style="color:var(--red)">⚠️ Vencidas sin resolver ({{ vencidas|length }})</h3>
+    <span style="font-size:11px;color:var(--red);font-weight:600">Requieren atención urgente</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Cliente</th><th>Tipo</th><th>Reg.Mercantil</th><th>Estado</th><th>Días</th><th></th></tr></thead>
+      <tbody>
+      {% for e in vencidas %}
+      {% set dias = ((hoy | string | replace('-','') | int) - (e.fecha_reg_mercantil | replace('-','') | int)) %}
+      <tr>
+        <td><a href="{{ url_for('escritura_editar', eid=e.id) }}" style="color:#dc2626;font-weight:700">{{ e.numero }}</a></td>
+        <td style="font-weight:500">{{ e.cliente[:24] }}</td>
+        <td style="font-size:11px;color:var(--muted)">{{ e.tipo[:18] if e.tipo else '—' }}</td>
+        <td style="color:#dc2626;font-weight:600;white-space:nowrap">{{ e.fecha_reg_mercantil }}</td>
+        <td><span class="badge b-enproceso">{{ e.estado }}</span></td>
+        <td style="color:#dc2626;font-weight:700;font-size:12px">{{ (hoy|string) | replace('-','') }}</td>
+        <td>
+          <a href="{{ url_for('escritura_editar', eid=e.id) }}" class="btn btn-sm btn-danger">Ver</a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Próximas 60 días -->
+{% if proximas %}
+<div class="card">
+  <div class="card-header">
+    <h3>📅 Próximos 60 días ({{ proximas|length }})</h3>
+    <span style="font-size:12px;color:var(--muted)">Registro Mercantil</span>
+  </div>
+
+  <!-- Vista calendario por mes -->
+  {% for mes_clave, escrituras_mes in meses.items() %}
+  <div style="padding:14px 18px;border-bottom:1px solid var(--cream2)">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">
+      📆 {{ mes_clave }}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+    {% for e in escrituras_mes %}
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold)">
+      <div style="min-width:44px;text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--navy);line-height:1">{{ e.fecha_reg_mercantil[8:10] }}</div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase">{{ e.fecha_reg_mercantil[5:7] }}/{{ e.fecha_reg_mercantil[0:4] }}</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;color:var(--navy);font-size:13px">Escritura #{{ e.numero }}</div>
+        <div style="font-size:12px;color:#374151;margin-top:2px">{{ e.cliente[:30] }}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">{{ e.tipo[:25] if e.tipo else '' }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        {% set est = e.estado %}
+        {% if est=='Ingresado' %}<span class="badge b-ingresado">{{ est }}</span>
+        {% elif est=='Redactada' %}<span class="badge b-redactada">{{ est }}</span>
+        {% elif est=='Firmada' %}<span class="badge b-firmada">{{ est }}</span>
+        {% elif est=='En Proceso' %}<span class="badge b-enproceso">{{ est }}</span>
+        {% elif est=='Listo para Retirar' %}<span class="badge b-listoretirar">{{ est }}</span>
+        {% else %}<span class="badge b-entregado">{{ est }}</span>{% endif %}
+        <a href="{{ url_for('escritura_editar', eid=e.id) }}" class="btn btn-sm btn-outline" style="font-size:11px">✏️ Editar</a>
+      </div>
+    </div>
+    {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="card">
+  <div class="card-body" style="text-align:center;padding:40px;color:var(--muted)">
+    <div style="font-size:40px;margin-bottom:12px">✅</div>
+    <div style="font-size:15px;font-weight:600">Sin vencimientos próximos</div>
+    <div style="font-size:13px;margin-top:6px">No hay escrituras con fecha de Registro Mercantil en los próximos 60 días.</div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Respaldos{% endblock %}
+{% block page_title %}Respaldos de Base de Datos{% endblock %}
+{% block page_title_mobile %}💾 Respaldos{% endblock %}
+{% block topbar_actions %}
+<form method="post" action="{{ url_for('respaldo_crear') }}">
+  <button class="btn btn-gold" type="submit">💾 Crear Respaldo Ahora</button>
+</form>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3>{{ rows|length }} respaldo{{ 's' if rows|length != 1 }}</h3>
+    <span style="font-size:12px;color:#64748b">Los respaldos se guardan en el servidor</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>N°</th><th>Nombre del archivo</th><th>Tamaño</th><th>Fecha creación</th><th>Acciones</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+      <tr>
+        <td style="color:#94a3b8;font-size:12px">#{{ r.id }}</td>
+        <td style="font-family:monospace;font-size:12px;color:#0d1b3e">{{ r.nombre }}</td>
+        <td style="font-size:12px;color:#64748b">{{ r.tamanio_kb }} KB</td>
+        <td style="font-size:12px;color:#64748b;white-space:nowrap">{{ r.created_at }}</td>
+        <td style="white-space:nowrap">
+          <a href="{{ url_for('respaldo_descargar', rid=r.id) }}" class="btn btn-sm btn-outline">⬇️ Descargar</a>
+          <form method="post" action="{{ url_for('respaldo_eliminar', rid=r.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este respaldo?')">
+            <button class="btn btn-sm btn-danger" type="submit">🗑</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:32px">No hay respaldos aún. Crea uno con el botón superior.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="background:#fffbeb;border-color:#fde68a">
+  <div class="card-body" style="font-size:13px;color:#92400e">
+    <strong>ℹ️ Recomendación:</strong> Crea un respaldo antes de cualquier cambio importante. Los archivos .db se pueden descargar y guardar localmente como copia de seguridad adicional.
+  </div>
+</div>
+{% endblock %}

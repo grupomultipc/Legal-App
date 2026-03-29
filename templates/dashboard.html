@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_title_mobile %}🏛 Dashboard{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('calendario') }}" class="btn btn-outline btn-sm">📅 Calendario</a>
+<a href="{{ url_for('buscar_global') }}" class="btn btn-outline btn-sm">🔍 Buscar</a>
+<span style="font-size:13px;color:#64748b">{{ hoy }}</span>
+{% endblock %}
+{% block content %}
+
+<!-- Stats escrituras -->
+<div class="stats-grid">
+  {% set elink = [('Ingresadas Hoy','Ingresadas Hoy'),('Total','Total'),('Ingresado','Ingresado'),('En Proceso','En Proceso'),('Listo para Retirar','Listo para Retirar'),('Entregado al Cliente','Entregado al Cliente')] %}
+  {% for key, label in elink %}
+  <a href="{{ url_for('escrituras', estado=key if key not in ['Ingresadas Hoy','Total'] else 'Todos') }}" class="stat-card" style="text-decoration:none">
+    <div class="val">{{ conteo.get(key, 0) }}</div>
+    <div class="lbl">{{ label }}</div>
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Finanzas (solo admin) -->
+{% if finanzas %}
+<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px">
+  <div class="stat-card" style="border-color:#bbf7d0">
+    <div class="lbl" style="margin-bottom:6px">💰 Ingresos este mes</div>
+    <div class="val" style="font-size:22px;color:#166534">{{ fmtQ(finanzas.ingresos) }}</div>
+  </div>
+  <div class="stat-card" style="border-color:#fecaca">
+    <div class="lbl" style="margin-bottom:6px">📤 Gastos este mes</div>
+    <div class="val" style="font-size:22px;color:#991b1b">{{ fmtQ(finanzas.gastos) }}</div>
+  </div>
+  <div class="stat-card" style="border-color:{{ '#bbf7d0' if finanzas.neto >= 0 else '#fecaca' }}">
+    <div class="lbl" style="margin-bottom:6px">📈 Neto este mes</div>
+    <div class="val" style="font-size:22px;color:{{ '#166534' if finanzas.neto >= 0 else '#991b1b' }}">{{ fmtQ(finanzas.neto) }}</div>
+  </div>
+</div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+<!-- Alertas registro mercantil -->
+<div class="card">
+  <div class="card-header">
+    <h3>⚠️ Alertas Registro Mercantil</h3>
+    <span style="font-size:12px;color:#b45309">+10 días sin avance</span>
+  </div>
+  {% if alertas %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Cliente</th><th>Ingresada</th><th>Estado</th></tr></thead>
+      <tbody>
+      {% for e in alertas %}
+      <tr>
+        <td><a href="{{ url_for('escritura_editar', eid=e.id) }}" style="color:#1d4ed8;font-weight:600">{{ e.numero }}</a></td>
+        <td>{{ e.cliente }}</td>
+        <td style="color:#b45309">{{ e.fecha_reg_mercantil }}</td>
+        <td>{% include '_badge.html' %}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body" style="text-align:center;color:#64748b;font-size:13px;padding:28px">
+    ✅ Sin alertas pendientes
+  </div>
+  {% endif %}
+</div>
+
+<!-- Últimas escrituras -->
+<div class="card">
+  <div class="card-header">
+    <h3>📜 Últimas Escrituras</h3>
+    <a href="{{ url_for('escrituras') }}" class="btn btn-sm btn-outline">Ver todas</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Cliente</th><th>Tipo</th><th>Estado</th></tr></thead>
+      <tbody>
+      {% for e in recientes %}
+      <tr>
+        <td><a href="{{ url_for('escritura_editar', eid=e.id) }}" style="color:#1d4ed8;font-weight:600">{{ e.numero }}</a></td>
+        <td>{{ e.cliente[:22] }}{{ '…' if e.cliente|length > 22 }}</td>
+        <td style="font-size:12px;color:#64748b">{{ e.tipo[:18] }}</td>
+        <td>
+          {% set estado = e.estado %}
+          {% if estado=='Ingresado' %}<span class="badge b-ingresado">{{ estado }}</span>
+          {% elif estado=='Redactada' %}<span class="badge b-redactada">{{ estado }}</span>
+          {% elif estado=='Firmada' %}<span class="badge b-firmada">{{ estado }}</span>
+          {% elif estado=='En Proceso' %}<span class="badge b-enproceso">{{ estado }}</span>
+          {% elif estado=='Listo para Retirar' %}<span class="badge b-listoretirar">{{ estado }}</span>
+          {% else %}<span class="badge b-entregado">{{ estado }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+{% endblock %}

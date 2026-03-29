@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Escrituras{% endblock %}
+{% block page_title %}Escrituras{% endblock %}
+{% block page_title_mobile %}📜 Escrituras{% endblock %}
+{% block mobile_fab %}<a href="{{ url_for('escritura_nueva') }}" class="btn btn-gold">+ Nueva</a>{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('calendario') }}" class="btn btn-outline" title="Calendario">📅</a>
+<a href="{{ url_for('exportar_escrituras') }}" class="btn btn-outline" title="Exportar CSV">📥 CSV</a>
+<a href="{{ url_for('escritura_nueva') }}" class="btn btn-gold">+ Nueva Escritura</a>
+{% endblock %}
+{% block content %}
+
+<!-- Conteo por estado -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+  <a href="{{ url_for('escrituras') }}" class="btn btn-sm {% if estado_sel=='Todos' %}btn-primary{% else %}btn-outline{% endif %}">Todos ({{ conteo.values()|sum }})</a>
+  {% for e in estados %}
+  {% set cnt = conteo.get(e, 0) %}
+  <a href="{{ url_for('escrituras', estado=e) }}" class="btn btn-sm {% if estado_sel==e %}btn-primary{% else %}btn-outline{% endif %}">{{ e }} ({{ cnt }})</a>
+  {% endfor %}
+</div>
+
+<!-- Búsqueda -->
+<form class="filter-bar" method="get">
+  <input type="hidden" name="estado" value="{{ estado_sel }}">
+  <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar por cliente, número o tipo…" style="flex:1;min-width:220px">
+  <button class="btn btn-primary" type="submit">Buscar</button>
+  {% if busca %}
+  <a href="{{ url_for('escrituras', estado=estado_sel) }}" class="btn btn-outline">Limpiar</a>
+  {% endif %}
+</form>
+
+<div class="card">
+  <div class="card-header">
+    <h3>{{ rows|length }} escritura{{ 's' if rows|length != 1 }}</h3>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Tipo</th><th>Cliente</th><th>Fecha</th>
+          <th>Estado</th><th>Honorarios</th><th>Reg. Mercantil</th><th>Avance</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for e in rows %}
+      <tr>
+        <td style="font-weight:700;color:#0d1b3e">{{ e.numero }}</td>
+        <td style="font-size:12px;color:#64748b">{{ e.tipo }}</td>
+        <td>{{ e.cliente }}</td>
+        <td style="font-size:12px;color:#64748b;white-space:nowrap">{{ e.fecha }}</td>
+        <td>
+          {% set estado = e.estado %}
+          {% if estado=='Ingresado' %}<span class="badge b-ingresado">{{ estado }}</span>
+          {% elif estado=='Redactada' %}<span class="badge b-redactada">{{ estado }}</span>
+          {% elif estado=='Firmada' %}<span class="badge b-firmada">{{ estado }}</span>
+          {% elif estado=='En Proceso' %}<span class="badge b-enproceso">{{ estado }}</span>
+          {% elif estado=='Listo para Retirar' %}<span class="badge b-listoretirar">{{ estado }}</span>
+          {% else %}<span class="badge b-entregado">{{ estado }}</span>
+          {% endif %}
+        </td>
+        <td style="font-weight:600;color:#0d1b3e">{{ fmtQ(e.honorarios) }}</td>
+        <td style="font-size:12px;color:{% if e.fecha_reg_mercantil %}#b45309{% else %}#94a3b8{% endif %}">
+          {{ e.fecha_reg_mercantil or '—' }}
+        </td>
+        <td style="min-width:90px">
+          {% if e.porcentaje_avance %}
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="progress" style="flex:1;min-width:50px"><div class="progress-fill" style="width:{{ e.porcentaje_avance }}%"></div></div>
+            <span style="font-size:11px;color:#64748b">{{ e.porcentaje_avance }}%</span>
+          </div>
+          {% else %}—{% endif %}
+        </td>
+        <td style="white-space:nowrap">
+          <a href="{{ url_for('escritura_editar', eid=e.id) }}" class="btn btn-sm btn-outline">✏️ Editar</a>
+          <form method="post" action="{{ url_for('escritura_eliminar', eid=e.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar escritura {{ e.numero }}?')">
+            <button class="btn btn-sm btn-danger" type="submit">🗑</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:32px">No hay escrituras</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

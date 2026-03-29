@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Oficina Jurídica{% endblock %} — Enriquez Flores <span style="font-family:'Times New Roman',Times,serif">&</span> Asociados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d1b3e;--navy2:#1a3260;--navy3:#243b6e;--gold:#d4a847;--gold2:#f0d070;--cream:#f4f1eb;--cream2:#ede9e0;--white:#ffffff;--green:#15803d;--red:#b91c1c;--amber:#b45309;--muted:#64748b;--border:#cbd5e1;--sw:220px;--topbar-h:58px;--mobile-nav-h:64px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:#1e293b}
+a{text-decoration:none;color:inherit}
+
+/* === VERSION BANNER === */
+.ver-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--navy);border-bottom:1px solid rgba(212,168,71,.22);display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 12px;height:34px}
+.ver-banner span{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.4px;margin-right:4px}
+.ver-btn{padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(212,168,71,.28);background:transparent;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;transition:.18s;display:flex;align-items:center;gap:5px;letter-spacing:.3px}
+.ver-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.ver-btn:not(.active):hover{background:rgba(255,255,255,.08);color:#fff}
+body{padding-top:34px}
+
+/* === DESKTOP === */
+body.desktop-mode{display:flex;min-height:100vh}
+body.desktop-mode .sidebar{display:flex;width:var(--sw);background:var(--navy);flex-direction:column;position:fixed;top:34px;left:0;height:calc(100vh - 34px);z-index:100;overflow-y:auto}
+.sidebar-logo{padding:22px 18px 14px;border-bottom:1px solid rgba(212,168,71,.2)}
+.sidebar-logo .scale{font-size:26px}
+.sidebar-logo h1{font-family:'Playfair Display',serif;font-size:13.5px;color:var(--gold);line-height:1.3;margin-top:6px}
+.sidebar-logo p{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+.sidebar-user{padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-user .uname{font-size:12px;font-weight:600;color:var(--gold2)}
+.sidebar-user .urole{font-size:10px;color:var(--muted);margin-top:2px}
+.sidebar nav{flex:1;padding:6px 0}
+.nav-section{padding:14px 18px 3px;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(212,168,71,.55)}
+.nav-link{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;color:#8fa3bb;transition:.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-link:hover{background:var(--navy2);color:#c5d5e8}
+.nav-link.active{background:var(--navy3);color:var(--gold);font-weight:600}
+.nav-link .ico{font-size:14px;width:20px;text-align:center}
+body.desktop-mode .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:calc(100vh - 34px)}
+body.desktop-mode .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:34px;z-index:50;height:var(--topbar-h)}
+body.desktop-mode .topbar h2{font-family:'Playfair Display',serif;font-size:19px;color:var(--navy);font-weight:700}
+body.desktop-mode .page-content{padding:26px;flex:1}
+
+/* === MOBILE === */
+body.mobile-mode{display:block;min-height:100vh;background:#f0ede6}
+body.mobile-mode .sidebar{display:none}
+body.mobile-mode .topbar{display:none}
+body.mobile-mode .page-content{padding:14px 12px;flex:1}
+
+/* Mobile header */
+.mobile-header{display:none;background:var(--navy);padding:10px 16px;align-items:center;justify-content:space-between;position:sticky;top:34px;z-index:200;height:52px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+body.mobile-mode .mobile-header{display:flex}
+.mobile-header-title{font-family:'Playfair Display',serif;font-size:13px;color:var(--gold);line-height:1.2}
+.mobile-header-title small{font-family:'DM Sans',sans-serif;font-size:9px;color:var(--muted);display:block}
+.mob-menu-btn{background:none;border:none;cursor:pointer;padding:4px;color:var(--gold);font-size:22px;display:flex;align-items:center}
+.mob-avatar{width:32px;height:32px;border-radius:50%;background:var(--navy3);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px}
+
+/* Mobile drawer */
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400}
+.mob-overlay.open{display:block}
+.mob-drawer{position:fixed;top:0;left:0;bottom:0;width:265px;background:var(--navy);z-index:500;overflow-y:auto;flex-direction:column;transform:translateX(-100%);transition:transform .28s ease;display:flex}
+.mob-drawer.open{transform:translateX(0)}
+.mob-drawer-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+/* Mobile bottom nav */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--mobile-nav-h);background:var(--white);border-top:1px solid var(--border);z-index:300;align-items:center;justify-content:space-around;padding:0 4px;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+body.mobile-mode .mobile-bottom-nav{display:flex}
+body.mobile-mode .main{margin-left:0!important;padding-bottom:calc(var(--mobile-nav-h) + 12px);min-height:auto}
+.mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;border-radius:10px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--muted);text-decoration:none;flex:1;min-width:0;transition:.15s}
+.mob-nav-item.active{color:var(--navy)}
+.mob-nav-ico-wrap{padding:3px 12px;border-radius:8px;transition:.15s}
+.mob-nav-item.active .mob-nav-ico-wrap{background:rgba(13,27,62,.1)}
+.mob-nav-ico{font-size:21px;line-height:1;display:block}
+.mob-nav-lbl{font-size:9.5px;font-weight:600;letter-spacing:.2px;white-space:nowrap}
+
+/* Mobile page title */
+.mobile-page-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--navy);padding:16px 14px 2px;display:none}
+body.mobile-mode .mobile-page-title{display:block}
+
+/* Mobile FAB */
+.mobile-fab{display:none;position:fixed;bottom:calc(var(--mobile-nav-h) + 14px);right:14px;z-index:250}
+body.mobile-mode .mobile-fab{display:block}
+.mobile-fab .btn{border-radius:28px;padding:11px 20px;box-shadow:0 4px 16px rgba(13,27,62,.3);font-size:14px;font-weight:600}
+
+/* Mobile cards */
+body.mobile-mode .card{border-radius:14px}
+body.mobile-mode .stats-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px;margin-bottom:16px}
+body.mobile-mode .stat-card{padding:12px 14px;border-radius:12px}
+body.mobile-mode .stat-card .val{font-size:24px}
+body.mobile-mode .stat-card .lbl{font-size:10px}
+body.mobile-mode .form-grid{grid-template-columns:1fr!important;gap:12px}
+body.mobile-mode .form-group input,body.mobile-mode .form-group select,body.mobile-mode .form-group textarea{font-size:16px!important;padding:10px 13px}
+body.mobile-mode .filter-bar input,body.mobile-mode .filter-bar select{font-size:15px}
+body.mobile-mode .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+body.mobile-mode table{font-size:12px;min-width:480px}
+body.mobile-mode th{font-size:10px;padding:7px 10px}
+body.mobile-mode td{padding:8px 10px}
+body.mobile-mode .modal{max-width:calc(100vw - 24px);padding:20px 16px;border-radius:16px;margin:0 12px}
+
+/* Desktop — hide mobile elements */
+body.desktop-mode .mobile-header,body.desktop-mode .mobile-bottom-nav,body.desktop-mode .mob-drawer,body.desktop-mode .mob-overlay,body.desktop-mode .mobile-page-title,body.desktop-mode .mobile-fab{display:none!important}
+
+/* === SHARED COMPONENTS === */
+.flash{padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px}
+.flash.ok{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+.flash.error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.card{background:var(--white);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-size:14px;font-weight:600;color:var(--navy)}
+.card-body{padding:18px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:var(--cream)}
+th{padding:9px 13px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+td{padding:9px 13px;border-top:1px solid var(--cream2);color:#374151;vertical-align:middle}
+tbody tr:hover{background:#fafaf8}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-ingresado{background:#dbeafe;color:#1e40af}
+.b-redactada{background:#e0e7ff;color:#3730a3}
+.b-firmada{background:#fef9c3;color:#854d0e}
+.b-enproceso{background:#ffedd5;color:#9a3412}
+.b-listoretirar{background:#dcfce7;color:#166534}
+.b-entregado{background:#f1f5f9;color:#475569}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:.15s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy2)}
+.btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover{background:var(--gold2)}
+.btn-sm{padding:4px 9px;font-size:12px}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--border)}.btn-outline:hover{background:var(--cream)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid #fecaca}.btn-danger:hover{background:#fee2e2}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#166534}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.form-group input,.form-group select,.form-group textarea{padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:#1e293b;transition:.15s;width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 3px rgba(26,50,96,.1)}
+.form-group textarea{resize:vertical;min-height:65px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.stat-card{background:var(--white);border-radius:10px;border:1px solid var(--border);padding:14px 18px;cursor:pointer;transition:.15s}
+.stat-card:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.stat-card .val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--navy);line-height:1}
+.stat-card .lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500}
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.filter-bar input,.filter-bar select{padding:7px 11px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff}
+.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--navy2)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:26px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal h3{font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);margin-bottom:18px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.progress{height:6px;background:var(--cream2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--gold);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- VERSION SWITCHER BANNER -->
+<div class="ver-banner">
+  <span>Vista:</span>
+  <button class="ver-btn" id="btn-desktop" onclick="setVersion('desktop')">🖥️ Computadora</button>
+  <button class="ver-btn" id="btn-mobile" onclick="setVersion('mobile')">📱 Celular</button>
+</div>
+
+{% if session.user %}
+<!-- DESKTOP SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="scale">⚖️</div>
+    <h1>Enriquez Flores<br><span style="font-family:'Times New Roman',Times,serif">&</span> Asociados</h1>
+    <p>Oficina Jurídica · Guatemala</p>
+  </div>
+  <div class="sidebar-user">
+    <div class="uname">{{ session.user.username }}</div>
+    <div class="urole">{% if session.user.rol=='administrador' %}👑 Administrador{% else %}👤 Usuario{% endif %}</div>
+  </div>
+  <nav>
+    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}"><span class="ico">🏛</span> Dashboard</a>
+    <a href="{{ url_for('escrituras') }}" class="nav-link {% if 'escritura' in (request.endpoint or '') %}active{% endif %}"><span class="ico">📜</span> Escrituras</a>
+    <a href="{{ url_for('clientes') }}" class="nav-link {% if 'cliente' in (request.endpoint or '') %}active{% endif %}"><span class="ico">👥</span> Clientes</a>
+    {% if session.user.rol=='administrador' %}
+    <div class="nav-section">💵 Finanzas</div>
+    <a href="{{ url_for('ingresos') }}" class="nav-link {% if request.endpoint=='ingresos' %}active{% endif %}"><span class="ico">💰</span> Ingresos</a>
+    <a href="{{ url_for('gastos') }}" class="nav-link {% if request.endpoint=='gastos' %}active{% endif %}"><span class="ico">📤</span> Gastos</a>
+    <a href="{{ url_for('reportes') }}" class="nav-link {% if request.endpoint=='reportes' %}active{% endif %}"><span class="ico">📊</span> Reportes</a>
+    {% endif %}
+    <div class="nav-section">Sistema</div>
+    <a href="{{ url_for('respaldos') }}" class="nav-link {% if request.endpoint=='respaldos' %}active{% endif %}"><span class="ico">💾</span> Respaldos</a>
+    {% if session.user.rol=='administrador' %}
+    <a href="{{ url_for('usuarios') }}" class="nav-link {% if request.endpoint=='usuarios' %}active{% endif %}"><span class="ico">🔐</span> Usuarios</a>
+    {% endif %}
+    <div class="nav-section">🛠 Herramientas</div>
+    <a href="{{ url_for('buscar_global') }}" class="nav-link {% if request.endpoint=='buscar_global' %}active{% endif %}"><span class="ico">🔍</span> Búsqueda Global</a>
+    <a href="{{ url_for('calendario') }}" class="nav-link {% if request.endpoint=='calendario' %}active{% endif %}"><span class="ico">📅</span> Calendario</a>
+    <a href="{{ url_for('exportar_escrituras') }}" class="nav-link"><span class="ico">📥</span> Exportar Escrituras</a>
+    <a href="{{ url_for('exportar_clientes') }}" class="nav-link"><span class="ico">📥</span> Exportar Clientes</a>
+    {% if session.user.rol=='administrador' %}
+    <a href="{{ url_for('exportar_finanzas') }}" class="nav-link"><span class="ico">📥</span> Exportar Finanzas</a>
+    {% endif %}
+  </nav>
+  <div style="padding:8px 18px 12px;border-top:1px solid rgba(255,255,255,.06)">
+    <a href="{{ url_for('logout') }}" class="nav-link" style="color:#ff9999;padding:8px 0"><span class="ico">🚪</span> Cerrar Sesión</a>
+    <div style="font-size:10px;color:var(--muted);padding:6px 0 0">v3.0 Web · Guatemala</div>
+  </div>
+</aside>
+
+<!-- MOBILE HEADER -->
+<header class="mobile-header">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="mob-menu-btn" onclick="openDrawer()">☰</button>
+    <div>
+      <div class="mobile-header-title">Enriquez Flores <span style="font-family:'Times New Roman',Times,serif">&</span> Asoc.
+        <small>Sistema Jurídico · Guatemala</small>
+      </div>
+    </div>
+  </div>
+  <div class="mob-avatar">{% if session.user.rol=='administrador' %}👑{% else %}👤{% endif %}</div>
+</header>
+
+<!-- MOBILE DRAWER OVERLAY -->
+<div class="mob-overlay" id="mobOverlay" onclick="closeDrawer()"></div>
+
+<!-- MOBILE DRAWER -->
+<div class="mob-drawer" id="mobDrawer">
+  <button class="mob-drawer-close" onclick="closeDrawer()">✕</button>
+  <div class="sidebar-logo" style="padding-top:44px">
+    <div class="scale">⚖️</div>
+    <h1>Enriquez Flores<br><span style="font-family:'Times New Roman',Times,serif">&</span> Asociados</h1>
+    <p>Oficina Jurídica · Guatemala</p>
+  </div>
+  <div class="sidebar-user">
+    <div class="uname">{{ session.user.username }}</div>
+    <div class="urole">{% if session.user.rol=='administrador' %}👑 Administrador{% else %}👤 Usuario{% endif %}</div>
+  </div>
+  <nav style="flex:1">
+    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}"><span class="ico">🏛</span> Dashboard</a>
+    <a href="{{ url_for('escrituras') }}" class="nav-link {% if 'escritura' in (request.endpoint or '') %}active{% endif %}"><span class="ico">📜</span> Escrituras</a>
+    <a href="{{ url_for('clientes') }}" class="nav-link {% if 'cliente' in (request.endpoint or '') %}active{% endif %}"><span class="ico">👥</span> Clientes</a>
+    {% if session.user.rol=='administrador' %}
+    <div class="nav-section">💵 Finanzas</div>
+    <a href="{{ url_for('ingresos') }}" class="nav-link {% if request.endpoint=='ingresos' %}active{% endif %}"><span class="ico">💰</span> Ingresos</a>
+    <a href="{{ url_for('gastos') }}" class="nav-link {% if request.endpoint=='gastos' %}active{% endif %}"><span class="ico">📤</span> Gastos</a>
+    <a href="{{ url_for('reportes') }}" class="nav-link {% if request.endpoint=='reportes' %}active{% endif %}"><span class="ico">📊</span> Reportes</a>
+    {% endif %}
+    <div class="nav-section">Sistema</div>
+    <a href="{{ url_for('respaldos') }}" class="nav-link {% if request.endpoint=='respaldos' %}active{% endif %}"><span class="ico">💾</span> Respaldos</a>
+    {% if session.user.rol=='administrador' %}
+    <a href="{{ url_for('usuarios') }}" class="nav-link {% if request.endpoint=='usuarios' %}active{% endif %}"><span class="ico">🔐</span> Usuarios</a>
+    {% endif %}
+    <div class="nav-section">🛠 Herramientas</div>
+    <a href="{{ url_for('buscar_global') }}" class="nav-link {% if request.endpoint=='buscar_global' %}active{% endif %}"><span class="ico">🔍</span> Búsqueda Global</a>
+    <a href="{{ url_for('calendario') }}" class="nav-link {% if request.endpoint=='calendario' %}active{% endif %}"><span class="ico">📅</span> Calendario</a>
+    <a href="{{ url_for('exportar_escrituras') }}" class="nav-link"><span class="ico">📥</span> Exportar CSV</a>
+  </nav>
+  <div style="padding:8px 18px 16px;border-top:1px solid rgba(255,255,255,.06)">
+    <a href="{{ url_for('logout') }}" class="nav-link" style="color:#ff9999;padding:8px 0"><span class="ico">🚪</span> Cerrar Sesión</a>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="{{ url_for('dashboard') }}" class="mob-nav-item {% if request.endpoint=='dashboard' %}active{% endif %}">
+    <div class="mob-nav-ico-wrap"><span class="mob-nav-ico">🏛</span></div>
+    <span class="mob-nav-lbl">Dashboard</span>
+  </a>
+  <a href="{{ url_for('escrituras') }}" class="mob-nav-item {% if 'escritura' in (request.endpoint or '') %}active{% endif %}">
+    <div class="mob-nav-ico-wrap"><span class="mob-nav-ico">📜</span></div>
+    <span class="mob-nav-lbl">Escrituras</span>
+  </a>
+  <a href="{{ url_for('clientes') }}" class="mob-nav-item {% if 'cliente' in (request.endpoint or '') %}active{% endif %}">
+    <div class="mob-nav-ico-wrap"><span class="mob-nav-ico">👥</span></div>
+    <span class="mob-nav-lbl">Clientes</span>
+  </a>
+  {% if session.user.rol=='administrador' %}
+  <a href="{{ url_for('ingresos') }}" class="mob-nav-item {% if request.endpoint in ['ingresos','gastos','reportes'] %}active{% endif %}">
+    <div class="mob-nav-ico-wrap"><span class="mob-nav-ico">💰</span></div>
+    <span class="mob-nav-lbl">Finanzas</span>
+  </a>
+  {% endif %}
+  <button class="mob-nav-item" onclick="openDrawer()">
+    <div class="mob-nav-ico-wrap"><span class="mob-nav-ico">⋯</span></div>
+    <span class="mob-nav-lbl">Más</span>
+  </button>
+</nav>
+{% endif %}
+
+<main class="main">
+  {% if session.user %}
+  <div class="topbar">
+    <h2>{% block page_title %}{% endblock %}</h2>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="position:relative" id="searchWrap">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar…" autocomplete="off"
+          style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:13px;width:190px;font-family:'DM\'s Sans',sans-serif;background:var(--cream)"
+          oninput="liveSearch(this.value)">
+        <div id="searchSugg" style="display:none;position:absolute;top:36px;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);width:300px;max-height:300px;overflow-y:auto;z-index:200"></div>
+      </div>
+      {% block topbar_actions %}{% endblock %}
+    </div>
+  </div>
+  <div class="mobile-page-title" id="mobPageTitle">{% block page_title_mobile %}{% endblock %}</div>
+  {% endif %}
+  <div class="page-content">
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}
+    <div class="flash {{ cat }}">{{ '✓' if cat=='ok' else '✕' }} {{ msg }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+{% if session.user %}
+<div class="mobile-fab" id="mobileFab">{% block mobile_fab %}{% endblock %}</div>
+{% endif %}
+
+{% block scripts %}{% endblock %}
+
+<!-- WELCOME / VERSION SELECTOR SCREEN -->
+<div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0d1b3e 0%,#1a3260 50%,#243b6e 100%);flex-direction:column;align-items:center;justify-content:center;padding:24px">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-size:52px;margin-bottom:14px">⚖️</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:26px;color:#d4a847;line-height:1.3;margin-bottom:6px">Enriquez Flores <span style="font-family:'Times New Roman',Times,serif">&</span> Asociados</h1>
+    <p style="font-size:13px;color:#64748b;letter-spacing:.8px;text-transform:uppercase">Sistema de Control Jurídico · Guatemala</p>
+  </div>
+  <p style="font-size:15px;color:rgba(255,255,255,.7);margin-bottom:28px;text-align:center">¿Cómo desea ver el sistema?</p>
+  <div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:340px">
+    <button onclick="setVersion('desktop')" style="display:flex;align-items:center;gap:18px;padding:20px 24px;background:rgba(255,255,255,.06);border:2px solid rgba(212,168,71,.35);border-radius:16px;cursor:pointer;transition:.2s;color:#fff;font-family:'DM Sans',sans-serif;text-align:left;width:100%"
+      onmouseover="this.style.background='rgba(212,168,71,.15)';this.style.borderColor='#d4a847'"
+      onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(212,168,71,.35)'">
+      <span style="font-size:38px">🖥️</span>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#d4a847;margin-bottom:3px">Versión Computadora</div>
+        <div style="font-size:12px;color:#8fa3bb;line-height:1.4">Pantalla completa con menú lateral.<br>Ideal para escritorio y laptop.</div>
+      </div>
+    </button>
+    <button onclick="setVersion('mobile')" style="display:flex;align-items:center;gap:18px;padding:20px 24px;background:rgba(255,255,255,.06);border:2px solid rgba(212,168,71,.35);border-radius:16px;cursor:pointer;transition:.2s;color:#fff;font-family:'DM Sans',sans-serif;text-align:left;width:100%"
+      onmouseover="this.style.background='rgba(212,168,71,.15)';this.style.borderColor='#d4a847'"
+      onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(212,168,71,.35)'">
+      <span style="font-size:38px">📱</span>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#d4a847;margin-bottom:3px">Versión Celular</div>
+        <div style="font-size:12px;color:#8fa3bb;line-height:1.4">Navegación táctil optimizada.<br>Ideal para teléfono y tablet.</div>
+      </div>
+    </button>
+  </div>
+  <p style="font-size:11px;color:#475569;margin-top:28px;text-align:center">Puede cambiar la vista en cualquier momento<br>desde la barra superior del sistema.</p>
+</div>
+
+<script>
+// === LIVE SEARCH ===
+var searchTimer;
+function liveSearch(q){
+  clearTimeout(searchTimer);
+  var sugg=document.getElementById('searchSugg');
+  if(!q||q.length<2){sugg.style.display='none';return}
+  searchTimer=setTimeout(function(){
+    fetch('/api/buscar?q='+encodeURIComponent(q))
+      .then(r=>r.json()).then(data=>{
+        if(!data.length){sugg.style.display='none';return}
+        sugg.innerHTML=data.map(function(d){
+          var ico=d.tipo==='escritura'?'📜':'👥';
+          return '<a href="'+d.url+'" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:#1e293b" onmousedown="event.preventDefault()">'
+            +'<span style="font-size:18px">'+ico+'</span>'
+            +'<div><div style="font-size:13px;font-weight:600">'+d.titulo+'</div>'
+            +'<div style="font-size:11px;color:#64748b">'+d.sub+'</div></div></a>';
+        }).join('')
+        +'<a href="/buscar?q='+encodeURIComponent(q)+'" style="display:block;padding:10px 14px;font-size:12px;color:#1d4ed8;text-align:center;font-weight:600;text-decoration:none">Ver todos los resultados →</a>';
+        sugg.style.display='block';
+      }).catch(function(){sugg.style.display='none'});
+  },250);
+}
+function hideSugg(){var s=document.getElementById('searchSugg');if(s)s.style.display='none'}
+document.addEventListener('click',function(e){if(!e.target.closest('#searchWrap'))hideSugg()});
+
+// === WHATSAPP HELPER (global) ===
+function enviarWA(tel, nombre, numero, estado){
+  var plantilla='seguimiento';
+  if(estado==='Listo para Retirar')plantilla='listo';
+  var url='/whatsapp/mensaje?tel='+encodeURIComponent(tel)
+    +'&nombre='+encodeURIComponent(nombre)
+    +'&numero='+encodeURIComponent(numero)
+    +'&estado='+encodeURIComponent(estado)
+    +'&plantilla='+plantilla;
+  window.open(url,'_blank');
+}
+
+// Version switcher
+function setVersion(v){
+  localStorage.setItem('oj_version',v);
+  // Hide welcome screen if visible
+  var ws=document.getElementById('welcomeScreen');
+  if(ws){ws.style.opacity='0';ws.style.transition='opacity .4s';setTimeout(function(){ws.style.display='none'},400);}
+  applyVersion(v);
+}
+function applyVersion(v){
+  document.body.classList.remove('desktop-mode','mobile-mode');
+  document.body.classList.add(v==='mobile'?'mobile-mode':'desktop-mode');
+  var bd=document.getElementById('btn-desktop');
+  var bm=document.getElementById('btn-mobile');
+  if(bd)bd.classList.toggle('active',v!=='mobile');
+  if(bm)bm.classList.toggle('active',v==='mobile');
+  // Sync mobile page title from desktop topbar
+  var dh=document.querySelector('.topbar h2');
+  var mh=document.getElementById('mobPageTitle');
+  if(dh&&mh&&!mh.textContent.trim()){mh.textContent=dh.textContent}
+}
+(function(){
+  var saved=localStorage.getItem('oj_version');
+  if(!saved){
+    // Show welcome screen on first visit
+    var ws=document.getElementById('welcomeScreen');
+    if(ws){ws.style.display='flex';}
+    // Default body class while waiting
+    document.body.classList.add('desktop-mode');
+  } else {
+    applyVersion(saved);
+  }
+})();
+
+// Mobile drawer
+function openDrawer(){document.getElementById('mobDrawer').classList.add('open');document.getElementById('mobOverlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeDrawer(){document.getElementById('mobDrawer').classList.remove('open');document.getElementById('mobOverlay').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDrawer()});
+</script>
+</body>
+</html>

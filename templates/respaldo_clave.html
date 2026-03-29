@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Autorización de Descarga{% endblock %}
+{% block page_title %}🔐 Autorización Requerida{% endblock %}
+{% block page_title_mobile %}🔐 Autorización{% endblock %}
+{% block content %}
+<div style="max-width:460px;margin:60px auto">
+  <div class="card" style="border-color:#dc2626">
+    <div class="card-header" style="background:#fef2f2;border-bottom:1px solid #fecaca">
+      <h3 style="color:#dc2626;margin:0">🔐 Acceso Restringido</h3>
+    </div>
+    <div class="card-body" style="padding:28px">
+      <p style="font-size:14px;color:#374151;margin-bottom:6px">
+        Archivo: <strong style="font-family:monospace;font-size:12px">{{ nombre }}</strong>
+      </p>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:24px">
+        La descarga de respaldos está protegida. Ingrese la clave de autorización del programador para continuar.
+      </p>
+      <form method="post" action="{{ url_for('respaldo_descargar', rid=rid) }}">
+        <div style="margin-bottom:20px">
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px">
+            Clave de Autorización
+          </label>
+          <input type="password" name="clave_prog" autofocus required
+            placeholder="Ingrese la clave del programador"
+            style="width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button type="submit" class="btn btn-gold" style="flex:1">
+            🔓 Autorizar y Descargar
+          </button>
+          <a href="{{ url_for('respaldos') }}" class="btn btn-outline" style="flex:1;text-align:center">
+            Cancelar
+          </a>
+        </div>
+      </form>
+      <p style="font-size:11px;color:#9ca3af;margin-top:16px;text-align:center">
+        ⚠️ Solo el programador del sistema tiene esta clave.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

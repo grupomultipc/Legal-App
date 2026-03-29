@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if e else 'Nueva' }} Escritura{% endblock %}
+{% block page_title %}{{ 'Editar Escritura #' + e.numero if e else 'Nueva Escritura' }}{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('escrituras') }}" class="btn btn-outline">← Volver</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <form method="post" id="frmEsc">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Número *</label>
+          <input type="text" name="numero" value="{{ e.numero if e else siguiente }}" required>
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select name="tipo" required>
+            {% for t in tipos %}
+            <option value="{{ t }}" {{ 'selected' if e and e.tipo==t }}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cliente *</label>
+          <input type="text" name="cliente" id="inpCliente" value="{{ e.cliente if e else '' }}" required autocomplete="off">
+          <div id="clienteSug" style="position:relative">
+            <ul id="sugList" style="display:none;position:absolute;top:0;left:0;right:0;background:#fff;border:1px solid #cbd5e1;border-radius:6px;z-index:200;list-style:none;box-shadow:0 4px 14px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;font-size:13px"></ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" name="fecha" value="{{ e.fecha if e else hoy }}" required>
+        </div>
+        <div class="form-group">
+          <label>Estado *</label>
+          <select name="estado" required>
+            {% for s in estados %}
+            <option value="{{ s }}" {{ 'selected' if e and e.estado==s else ('selected' if not e and s=='Ingresado') }}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Honorarios (Q)</label>
+          <input type="number" step="0.01" min="0" name="honorarios" value="{{ e.honorarios if e else '0' }}">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Descripción</label>
+          <textarea name="descripcion">{{ e.descripcion if e else '' }}</textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Notas</label>
+          <textarea name="notas">{{ e.notas if e else '' }}</textarea>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:22px 0">
+      <h4 style="font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">📋 Registro Mercantil</h4>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Fecha ingreso R.M.</label>
+          <input type="date" name="fecha_reg_mercantil" value="{{ e.fecha_reg_mercantil if e else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Hora ingreso R.M.</label>
+          <input type="time" name="hora_reg_mercantil" value="{{ e.hora_reg_mercantil if e else '' }}">
+        </div>
+        <div class="form-group">
+          <label>N° Documento</label>
+          <input type="text" name="num_documento" value="{{ e.num_documento if e else '' }}" placeholder="Número de documento">
+        </div>
+        <div class="form-group">
+          <label>Porcentaje avance (%)</label>
+          <input type="number" min="0" max="100" name="porcentaje_avance" value="{{ e.porcentaje_avance if e else '0' }}">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Notas de avance</label>
+          <textarea name="avance_reg">{{ e.avance_reg if e else '' }}</textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+        <a href="{{ url_for('escrituras') }}" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-gold">{{ '💾 Guardar Cambios' if e else '✚ Crear Escritura' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const inp = document.getElementById('inpCliente');
+const ul  = document.getElementById('sugList');
+let timer;
+inp.addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    const q = inp.value.trim();
+    if (q.length < 1) { ul.style.display='none'; return; }
+    const r = await fetch('/api/clientes?q='+encodeURIComponent(q));
+    const data = await r.json();
+    ul.innerHTML = '';
+    if (!data.length) { ul.style.display='none'; return; }
+    data.forEach(n => {
+      const li = document.createElement('li');
+      li.textContent = n;
+      li.style.cssText = 'padding:8px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9';
+      li.addEventListener('mousedown', () => { inp.value = n; ul.style.display='none'; });
+      li.addEventListener('mouseover', () => li.style.background='#f8fafc');
+      li.addEventListener('mouseout',  () => li.style.background='');
+      ul.appendChild(li);
+    });
+    ul.style.display='block';
+  }, 200);
+});
+document.addEventListener('click', e => { if (!inp.contains(e.target)) ul.style.display='none'; });
+</script>
+{% endblock %}

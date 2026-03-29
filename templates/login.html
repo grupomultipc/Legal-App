@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar Sesión — Oficina Jurídica Enriquez Flores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0d1b3e;min-height:100vh;display:flex;align-items:center;justify-content:center;background-image:radial-gradient(ellipse at 20% 50%, #1a3260 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, #243b6e 0%, transparent 50%)}
+.login-box{background:rgba(255,255,255,.97);border-radius:16px;padding:44px 40px;width:100%;max-width:400px;box-shadow:0 25px 60px rgba(0,0,0,.4)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .scale{font-size:38px;margin-bottom:10px}
+.login-logo h1{font-family:'Playfair Display',serif;font-size:20px;color:#0d1b3e;line-height:1.3}
+.login-logo p{font-size:11px;color:#64748b;margin-top:4px;letter-spacing:.6px;text-transform:uppercase}
+.divider{height:1px;background:#e2e8f0;margin:0 0 28px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.form-group label{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.4px}
+.form-group input{padding:10px 13px;border:1px solid #cbd5e1;border-radius:7px;font-size:14px;font-family:'DM Sans',sans-serif;transition:.15s}
+.form-group input:focus{outline:none;border-color:#1a3260;box-shadow:0 0 0 3px rgba(26,50,96,.12)}
+.btn-login{width:100%;padding:12px;background:#0d1b3e;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:8px;transition:.2s;letter-spacing:.3px}
+.btn-login:hover{background:#1a3260}
+.error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:10px 13px;border-radius:6px;font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.footer-note{text-align:center;margin-top:24px;font-size:11px;color:#94a3b8}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="login-logo">
+    <div class="scale">⚖️</div>
+    <h1>Enriquez Flores <span style="font-family:'Times New Roman',Times,serif">&</span> Asociados</h1>
+    <p>Sistema de Control Jurídico</p>
+  </div>
+  <div class="divider"></div>
+  {% if error %}
+  <div class="error">✕ {{ error }}</div>
+  {% endif %}
+  <form method="post">
+    <div class="form-group">
+      <label>Usuario</label>
+      <input type="text" name="username" autofocus autocomplete="username" required placeholder="Ingrese su usuario">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" name="password" autocomplete="current-password" required placeholder="••••••••">
+    </div>
+    <button type="submit" class="btn-login">Iniciar Sesión →</button>
+  </form>
+  <div class="footer-note">Guatemala · {{ year }} · Uso interno</div>
+</div>
+<!-- WELCOME / VERSION SELECTOR SCREEN (login page) -->
+<div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0d1b3e 0%,#1a3260 50%,#243b6e 100%);flex-direction:column;align-items:center;justify-content:center;padding:24px">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-size:52px;margin-bottom:14px">⚖️</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:26px;color:#d4a847;line-height:1.3;margin-bottom:6px">Enriquez Flores <span style="font-family:'Times New Roman',Times,serif">&</span> Asociados</h1>
+    <p style="font-size:13px;color:#64748b;letter-spacing:.8px;text-transform:uppercase">Sistema de Control Jurídico · Guatemala</p>
+  </div>
+  <p style="font-size:15px;color:rgba(255,255,255,.7);margin-bottom:28px;text-align:center">¿Cómo desea ver el sistema?</p>
+  <div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:340px">
+    <button onclick="elegirVista('desktop')" style="display:flex;align-items:center;gap:18px;padding:20px 24px;background:rgba(255,255,255,.06);border:2px solid rgba(212,168,71,.35);border-radius:16px;cursor:pointer;transition:.2s;color:#fff;font-family:'DM Sans',sans-serif;text-align:left;width:100%"
+      onmouseover="this.style.background='rgba(212,168,71,.15)';this.style.borderColor='#d4a847'"
+      onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(212,168,71,.35)'">
+      <span style="font-size:38px">🖥️</span>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#d4a847;margin-bottom:3px">Versión Computadora</div>
+        <div style="font-size:12px;color:#8fa3bb;line-height:1.4">Pantalla completa con menú lateral.<br>Ideal para escritorio y laptop.</div>
+      </div>
+    </button>
+    <button onclick="elegirVista('mobile')" style="display:flex;align-items:center;gap:18px;padding:20px 24px;background:rgba(255,255,255,.06);border:2px solid rgba(212,168,71,.35);border-radius:16px;cursor:pointer;transition:.2s;color:#fff;font-family:'DM Sans',sans-serif;text-align:left;width:100%"
+      onmouseover="this.style.background='rgba(212,168,71,.15)';this.style.borderColor='#d4a847'"
+      onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(212,168,71,.35)'">
+      <span style="font-size:38px">📱</span>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#d4a847;margin-bottom:3px">Versión Celular</div>
+        <div style="font-size:12px;color:#8fa3bb;line-height:1.4">Navegación táctil optimizada.<br>Ideal para teléfono y tablet.</div>
+      </div>
+    </button>
+  </div>
+  <p style="font-size:11px;color:#475569;margin-top:28px;text-align:center">Puede cambiar la vista en cualquier momento<br>desde la barra superior del sistema.</p>
+</div>
+<script>
+function elegirVista(v){
+  localStorage.setItem('oj_version',v);
+  var ws=document.getElementById('welcomeScreen');
+  ws.style.opacity='0';ws.style.transition='opacity .4s';
+  setTimeout(function(){ws.style.display='none'},400);
+}
+(function(){
+  if(!localStorage.getItem('oj_version')){
+    document.getElementById('welcomeScreen').style.display='flex';
+  }
+})();
+</script>
+</body>
+</html>

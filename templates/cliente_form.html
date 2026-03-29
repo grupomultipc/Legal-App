@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if c else 'Nuevo' }} Cliente{% endblock %}
+{% block page_title %}{{ 'Editar Cliente' if c else 'Nuevo Cliente' }}{% endblock %}
+{% block page_title_mobile %}{{ '✏️ Editar Cliente' if c else '👤 Nuevo Cliente' }}{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('clientes') }}" class="btn btn-outline">← Volver</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <form method="post">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre completo *</label>
+          <input type="text" name="nombre" value="{{ c.nombre if c else '' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" name="telefono" value="{{ c.telefono if c else '' }}" placeholder="502-XXXX-XXXX">
+        </div>
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input type="text" name="whatsapp" value="{{ c.whatsapp if c else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" name="email" value="{{ c.email if c else '' }}">
+        </div>
+        <div class="form-group">
+          <label>DPI / CUI</label>
+          <input type="text" name="dpi" value="{{ c.dpi if c else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Ocupación</label>
+          <select name="ocupacion">
+            <option value="">— Seleccionar —</option>
+            {% for o in ocupaciones %}
+            <option value="{{ o }}" {{ 'selected' if c and c.ocupacion==o }}>{{ o }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Dirección</label>
+          <input type="text" name="direccion" value="{{ c.direccion if c else '' }}">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Notas</label>
+          <textarea name="notas">{{ c.notas if c else '' }}</textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+        <a href="{{ url_for('clientes') }}" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-gold">{{ '💾 Guardar Cambios' if c else '✚ Crear Cliente' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if c and c.whatsapp %}
+<div class="card" style="margin-bottom:20px;border-color:#bbf7d0">
+  <div class="card-header" style="background:#f0fdf4">
+    <h3 style="color:#166534">💬 Enviar WhatsApp a {{ c.nombre }}</h3>
+  </div>
+  <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px">
+    <button onclick="enviarWA('{{ c.whatsapp }}','{{ c.nombre }}','','Seguimiento')" class="btn btn-green">📋 Seguimiento</button>
+    <button onclick="enviarWA('{{ c.whatsapp }}','{{ c.nombre }}','','Recordatorio')" class="btn btn-outline" style="border-color:#16a34a;color:#166534">🔔 Recordatorio</button>
+    <button onclick="enviarWA('{{ c.whatsapp }}','{{ c.nombre }}','','Bienvenida')" class="btn btn-outline" style="border-color:#16a34a;color:#166534">👋 Bienvenida</button>
+    <a href="https://wa.me/502{{ c.whatsapp }}" target="_blank" class="btn btn-outline" style="border-color:#16a34a;color:#166534">📱 Chat directo</a>
+  </div>
+</div>
+{% endif %}
+{% if historial %}
+<div class="card">
+  <div class="card-header"><h3>📜 Historial de Escrituras</h3></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Tipo</th><th>Fecha</th><th>Estado</th><th>Honorarios</th></tr></thead>
+      <tbody>
+      {% for e in historial %}
+      <tr>
+        <td style="font-weight:700;color:#0d1b3e"><a href="{{ url_for('escritura_editar', eid=e.id) }}" style="color:#1d4ed8">{{ e.numero }}</a></td>
+        <td style="font-size:12px;color:#64748b">{{ e.tipo }}</td>
+        <td style="font-size:12px;color:#64748b">{{ e.fecha }}</td>
+        <td>
+          {% set estado = e.estado %}
+          {% if estado=='Ingresado' %}<span class="badge b-ingresado">{{ estado }}</span>
+          {% elif estado=='Redactada' %}<span class="badge b-redactada">{{ estado }}</span>
+          {% elif estado=='Firmada' %}<span class="badge b-firmada">{{ estado }}</span>
+          {% elif estado=='En Proceso' %}<span class="badge b-enproceso">{{ estado }}</span>
+          {% elif estado=='Listo para Retirar' %}<span class="badge b-listoretirar">{{ estado }}</span>
+          {% else %}<span class="badge b-entregado">{{ estado }}</span>
+          {% endif %}
+        </td>
+        <td style="font-weight:600">{{ fmtQ(e.honorarios) }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
